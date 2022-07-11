@@ -1,5 +1,5 @@
 # Notreal™ Engine
-An engine that has totally ~~un~~notreal capabilites. This is a wip hobby graphics engine written with C++, OpenGL, and GLFW. I am following the wonderful [LearnOpenGL](https://learnopengl.com/) tutorial!
+A graphics engine that has totally ~~un~~notreal capabilites. This is a wip hobby graphics engine written with C++, OpenGL, and GLFW. I am following the wonderful [LearnOpenGL](https://learnopengl.com/) tutorial!
 
 ### Cutting-Bleeding-Edge-Vanguard-Super-Ultra™ Tech Demo
 <p align="center">
