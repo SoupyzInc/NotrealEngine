@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Shaders/shader.h"
+#include "stb_image.h"
 
 using namespace std;
 
@@ -87,6 +88,10 @@ int main() {
 	Shader ourShader(VERTEX_SHADER_DIR, FRAGMENT_SHADER_DIR);
 #pragma endregion
 
+#pragma region Textures
+
+#pragma endregion
+
 #pragma region User Defined Shapes
 	float vertices[] = {
 		// Pos (xyz)       // Col (rgb)
@@ -100,6 +105,42 @@ int main() {
 		0, 2, 3,   // front left
 		0, 1, 3    // front right
 	};
+	
+	float textureCoordinates[] {
+		0.0f, 0.5f, 0.0f, // top
+		-0.2f, -0.1f, 0.0f, // left
+		0.0f, -0.4f, 0.0f  // bottom
+	};
+#pragma endregion
+
+#pragma region User Defined Textures
+	unsigned int texture;
+	glGenTextures(1, &texture); // Set ID to texture.
+	glBindTexture(GL_TEXTURE_2D, texture);
+	
+	// Set texture wrapping and filtering.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use more pixelated filtering to scale down.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use more blurry filtering to scale up.
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	// Load image data.
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load("Textures/container.jpg", &width, &height, &nrChannels, 0);
+	
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	} else {
+		cout << " Failed to load texture." << endl;
+	}
+	
+	// Free memory.
+	stbi_image_free(data);
 #pragma endregion
 
 #pragma region VBO, VBA, EBO
