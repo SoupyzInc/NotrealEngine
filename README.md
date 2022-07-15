@@ -19,3 +19,8 @@ A graphics engine that has totally ~~un~~notreal capabilites. This is a wip hobb
   - [ ] Coordinate Systems
   - [ ] Camera 
   - [ ] Review
+- [ ] Lighting
+- [ ] Model Loading
+- [ ] Advanced OpenGL
+- [ ] Advanced Lighting
+- [ ] PBR
