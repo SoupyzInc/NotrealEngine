@@ -16,7 +16,7 @@ A graphics engine that has totally ~~un~~notreal capabilities. This is a wip hob
 <summary><b>Textures</b></summary>
 <blockquote>
   <p align="center">
-    <img width="48%" src="https://github.com/SoupyzInc/NotrealEngine/blob/main/Demo/0e962d3/multitexture_demo.png" alt="A rainbow box fading into a rainbow awesome face.">
+    <img width="48%" src="https://github.com/SoupyzInc/NotrealEngine/blob/main/Demo/0e962d3/multitexture_demo.gif" alt="A rainbow box fading into a rainbow awesome face.">
   </p>
 </blockquote>
 </details>
