@@ -7,8 +7,11 @@ include_directories(lib/STB) # STB header files
 include_directories(${PROJECT_SOURCE_DIR}/lib/GLAD/include) # Include GLAD header files
 include_directories(${PROJECT_SOURCE_DIR}/lib/GLFW/glfw-3.3.7/include) # GLFW header files
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/GLFW/glfw-3.3.7) # GLFW CMakeList.txt
+include_directories(${PROJECT_SOURCE_DIR}/lib/GLM) # GLM header files
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/GLM) # GLM CMakeList.txt
 
 add_executable(NotrealEngine main.cpp lib/GLAD/glad.c Shaders/shader.h lib/STB/stb_image.h lib/STB/stb_image.cpp)
+#add_executable(NotrealEngine test.cpp lib/GLAD/glad.c Shaders/shader.h lib/STB/stb_image.h lib/STB/stb_image.cpp)
 
 #target_link_libraries(NotrealEngine -lOpenGL32 -lfreeGLUT) # GLUT
 target_link_libraries(NotrealEngine -lOpenGL32 -lglu32) # OpenGL

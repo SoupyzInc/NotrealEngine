@@ -2,10 +2,13 @@
 #include <climits>
 #include <iostream>
 #include <cstring>
-#include <cmath>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include "lib/GLM/glm.hpp"
+#include "lib/GLM/gtc/matrix_transform.hpp"
+#include "lib/GLM/gtc/type_ptr.hpp"
 
 #include "Shaders/shader.h"
 #include "stb_image.h"
@@ -261,7 +264,6 @@ int main() {
 	// Tell OpenGL which texture unit each shader sampler belongs to.
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
-	
 	
 	// Render loop
 	while (!glfwWindowShouldClose(window)) {
