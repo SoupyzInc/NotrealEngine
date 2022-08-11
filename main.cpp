@@ -5,6 +5,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <iomanip>
 
 #include "lib/GLM/glm.hpp"
 #include "lib/GLM/gtc/matrix_transform.hpp"
@@ -37,13 +38,13 @@ void processInput(GLFWwindow *window) {
 	
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		if (mixValue < 1.0f) {
-			mixValue += 0.01f;
+			mixValue += 0.0005f;
 		}
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		if (mixValue > 0.0f) {
-			mixValue -= 0.01f;
+			mixValue -= 0.0005f;
 		}
 	}
 }
@@ -71,6 +72,8 @@ int main() {
 	
 	glfwMakeContextCurrent(window); // Make context of window the main context on the current thread.
 	
+	glfwSwapInterval( 0 ); // Disable vsync.
+	
 	// GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling
 	// any OpenGL functions.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -82,6 +85,9 @@ int main() {
 	
 	// Tell GLFW that we want to call this function when window size changes.
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	
+	// Enable depth testing.
+	glEnable(GL_DEPTH_TEST);
 #pragma endregion
 
 #pragma region Shaders
@@ -122,13 +128,13 @@ int main() {
 //	};
 
 // Rectangle of 2 triangles
-	float vertices[] = {
-		// positions          // colors           // texture coords
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
-	};
+//	float vertices[] = {
+//		// positions          // colors           // texture coords
+//		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+//		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+//		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+//		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+//	};
 	
 	// Example of nonfilled textured areas.
 //	float vertices[] = {
@@ -138,10 +144,68 @@ int main() {
 //		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   -0.5f, -0.5f,   // bottom left
 //		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   -0.5f, 1.5f    // top left
 //	};
+
+//	unsigned int indices[] = {
+//		0, 1, 3, // first triangle
+//		1, 2, 3  // second triangle
+//	};
 	
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
+	float vertices[] = {
+		// Positions        	// Colors           // Texture Coords
+		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		
+		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+
+		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+
+		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f
+	};
+	
+	glm::vec3 cubePositions[] = {
+		glm::vec3( 0.0f,  0.0f,  0.0f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3( 1.3f, -2.0f, -2.5f),
+		glm::vec3( 1.5f,  2.0f, -2.5f),
+		glm::vec3( 1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f),
+		glm::vec3( 2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3( 2.4f, -0.4f, -3.5f)
 	};
 #pragma endregion
 
@@ -179,11 +243,11 @@ int main() {
 	
 	// Generate EBO
 	// ------------
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+//	unsigned int EBO;
+//	glGenBuffers(1, &EBO);
+//
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	
 	// Textures
 	// --------
@@ -265,19 +329,52 @@ int main() {
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
 	
+	double timeNow = 0.0;
+	double timePrev = 0.0;
+	double delTime = 0.0;
+	unsigned int frames = 0;
+	unsigned int averageFps = 0;
+	unsigned int counter = 1;
+	double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	
+	cout.setf(ios::fixed);
+	cout.setf(ios::showpoint);
+	cout.precision(2);
+	
 	// Render loop
 	while (!glfwWindowShouldClose(window)) {
+		frames++;
+		timeNow = round(glfwGetTime() * 100); // Use 2 decimal places of accuracy
+		delTime = timeNow - timePrev;
+		
+		if (delTime == 100) { // If exactly one second has passed.
+			FPSs[counter - 1] = frames;
+			
+			if (counter % 10 == 0) {
+				counter = 0;
+			}
+			
+			averageFps = round((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
+			
+			string FPS = to_string(frames);
+			string newTitle = "Notreal Engine | " + FPS + " FPS/" + to_string(averageFps) + " AFPS";
+			glfwSetWindowTitle(window, newTitle.c_str());
+			
+			frames = 0;
+			timePrev = timeNow;
+			counter++;
+		}
+		
 		processInput(window); // Check for key inputs.
 		
 		// Rendering Commands
 		// ------------------
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		// Bind Textures
 		// -------------
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
@@ -287,23 +384,55 @@ int main() {
 		
 		// Create Transformations
 		// ----------------------
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		// The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
+		glm::mat4 model = glm::mat4(1.0f);
+//		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate plane by rotating on the x-axis, so it is laying on the "floor."
+//		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 		
-		unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		// The view matrix.
+		glm::mat4 view = glm::mat4(1.0f);
+		// Move scene away from origin (towards -z) to allow camera to view any objects.
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 		
+		// The projection matrix.
+		glm::mat4 projection = glm::mat4(1.0f);
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+		
+		// Send matrices to shader. This is typically done as transformations tend to change frequently.
+//		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+//		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		
+		int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		
+		int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		
+		// Render boxes
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		for (unsigned int i = 0; i < 10; i++) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+			// Rotate every other box.
+			if (i % 2 == 0) {
+				model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+			}
+
+			int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 		
-		trans = glm::mat4(1.0f);
-		trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-		float k = abs(sin(glfwGetTime()));
-		trans = glm::scale(trans, glm::vec3(k, k, k));
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 		
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		glfwSwapBuffers(window); // Swaps color buffer.
 		glfwPollEvents(); // Checks if any events are triggered.
@@ -312,7 +441,7 @@ int main() {
 	// Relieve buffers.
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+//	glDeleteBuffers(1, &EBO);
 	
 	// Terminate GLFW and relieve all allocated GLFW resources.
 	glfwTerminate();

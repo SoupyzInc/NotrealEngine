@@ -10,5 +10,23 @@ uniform sampler2D texture2;
 
 void main()
 {
-    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), mixValue);
+    // If there is transparency, do not mix with other texture.
+    // Instead just display the other texture.
+     if (texture(texture1, TexCoord).a != 1) {
+         FragColor = texture(texture2, TexCoord);
+     } else if (texture(texture2, TexCoord).a != 1) {
+         FragColor = texture(texture1, TexCoord);
+     } else {
+         FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), mixValue);
+     }
+//
+//    if (texture(texture1, TexCoord).a == 0) {
+//        FragColor = texture(texture2, TexCoord);
+//    } else if (texture(texture2, TexCoord).a == 0) {
+//        FragColor = texture(texture1, TexCoord);
+//    } else {
+//        FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), mixValue);
+//    }
+    
+//    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), mixValue);
 }
