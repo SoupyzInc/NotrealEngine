@@ -35,13 +35,13 @@ void processInput(GLFWwindow *window) {
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	
+
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		if (mixValue < 1.0f) {
 			mixValue += 0.0005f;
 		}
 	}
-	
+
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		if (mixValue > 0.0f) {
 			mixValue -= 0.0005f;
@@ -73,7 +73,7 @@ int main() {
 	glfwMakeContextCurrent(window); // Make context of window the main context on the current thread.
 	
 	glfwSwapInterval( 0 ); // Disable vsync.
-	
+
 	// GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling
 	// any OpenGL functions.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -85,7 +85,7 @@ int main() {
 	
 	// Tell GLFW that we want to call this function when window size changes.
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	
+
 	// Enable depth testing.
 	glEnable(GL_DEPTH_TEST);
 #pragma endregion
@@ -95,10 +95,10 @@ int main() {
 	char buff[PATH_MAX];
 	_getcwd(buff, PATH_MAX);
 	string current_working_dir(buff);
-	current_working_dir = current_working_dir.substr(0, 37);
-	
+	current_working_dir = current_working_dir.substr(0, 43);
+
 	// Create file directory prefixes for shaders.
-	const string PREFIX = current_working_dir + "\\Shaders\\";
+	const string PREFIX = current_working_dir + "Shaders\\";
 	
 	// Char[] for vertex shader directory.
 	char VERTEX_SHADER_DIR[PREFIX.size() + strlen("vertexShader.glsl")];
@@ -135,7 +135,7 @@ int main() {
 //		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
 //		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
 //	};
-	
+
 	// Example of nonfilled textured areas.
 //	float vertices[] = {
 //		// positions          // colors           // texture coords
@@ -149,7 +149,7 @@ int main() {
 //		0, 1, 3, // first triangle
 //		1, 2, 3  // second triangle
 //	};
-	
+
 	float vertices[] = {
 		// Positions        	// Colors           // Texture Coords
 		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
@@ -158,7 +158,7 @@ int main() {
 		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
 		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
 		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		
+
 		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
 		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
 		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
@@ -219,7 +219,7 @@ int main() {
 	// Bind aforementioned buffer to array buffer type. From here on, all buffer calls on the
 	// GL_ARRAY_BUFFER target will be used to configure the bound buffer, VBO.
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	
+
 	// Copy the triangles vertices into the buffer's memory. glBufferData() is specifically
 	// targeted to copy user-defined data into the buffer.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -254,7 +254,7 @@ int main() {
 	// Set vertex texture attribute pointers.
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-	
+
 	glEnable(GL_BLEND); // Enable blending.
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Allow transparency to work with PNGs.
 #pragma endregion
@@ -262,53 +262,53 @@ int main() {
 #pragma region User Defined Textures
 	unsigned int texture1, texture2;
 	int width, height, nrChannels;
-	
+
 	// Texture 1
 	// ---------
 	glGenTextures(1, &texture1); // Set ID to texture.
 	glBindTexture(GL_TEXTURE_2D, texture1);
-	
+
 	// Set texture wrapping and filtering.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use more pixelated filtering to scale down.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use more blurry filtering to scale up.
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
+
 	// Load image data.
 	char TEXTURE1_DIR[current_working_dir.size() + strlen(R"(Textures\container.jpg)")];
 	strcpy(TEXTURE1_DIR, (current_working_dir + R"(Textures\container.jpg)").c_str());
 	unsigned char *data = stbi_load(TEXTURE1_DIR, &width, &height, &nrChannels, 0);
-	
+
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	} else {
 		cout << " Failed to load texture 1." << endl;
 	}
-	
+
 	stbi_image_free(data); // Free memory.
-	
+
 	// Texture 2
 	// ---------
 	stbi_set_flip_vertically_on_load(true); // From here on, tell stb_image.h to flip loaded textures on y-axis (only flip texture 2).
-	
+
 	glGenTextures(1, &texture2); // Set ID to texture.
 	glBindTexture(GL_TEXTURE_2D, texture2);
-	
+
 	// Set texture wrapping and filtering.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use more pixelated filtering to scale down.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use more blurry filtering to scale up.
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
+
 	// Load image data.
 	char TEXTURE2_DIR[current_working_dir.size() + strlen(R"(Textures\awesomeface.png)")];
 	strcpy(TEXTURE2_DIR, (current_working_dir + R"(Textures\awesomeface.png)").c_str());
@@ -319,16 +319,16 @@ int main() {
 	} else {
 		cout << " Failed to load texture 2." << endl;
 	}
-	
+
 	stbi_image_free(data); // Free memory.
 #pragma endregion
-	
+
 	ourShader.use(); // Activate our shader before use.
-	
+
 	// Tell OpenGL which texture unit each shader sampler belongs to.
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
-	
+
 	double timeNow = 0.0;
 	double timePrev = 0.0;
 	double delTime = 0.0;
@@ -336,35 +336,35 @@ int main() {
 	unsigned int averageFps = 0;
 	unsigned int counter = 1;
 	double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	
+
 	cout.setf(ios::fixed);
 	cout.setf(ios::showpoint);
 	cout.precision(2);
-	
+
 	// Render loop
 	while (!glfwWindowShouldClose(window)) {
 		frames++;
 		timeNow = round(glfwGetTime() * 100); // Use 2 decimal places of accuracy
 		delTime = timeNow - timePrev;
-		
+
 		if (delTime == 100) { // If exactly one second has passed.
 			FPSs[counter - 1] = frames;
-			
+
 			if (counter % 10 == 0) {
 				counter = 0;
 			}
-			
+
 			averageFps = round((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
-			
+
 			string FPS = to_string(frames);
 			string newTitle = "Notreal Engine | " + FPS + " FPS/" + to_string(averageFps) + " AFPS";
 			glfwSetWindowTitle(window, newTitle.c_str());
-			
+
 			frames = 0;
 			timePrev = timeNow;
 			counter++;
 		}
-		
+
 		processInput(window); // Check for key inputs.
 		
 		// Rendering Commands
@@ -381,33 +381,33 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		
 		ourShader.setFloat("mixValue", mixValue); // Mix textures
-		
+
 		// Create Transformations
 		// ----------------------
 		// The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
 		glm::mat4 model = glm::mat4(1.0f);
 //		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate plane by rotating on the x-axis, so it is laying on the "floor."
 //		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-		
+
 		// The view matrix.
 		glm::mat4 view = glm::mat4(1.0f);
 		// Move scene away from origin (towards -z) to allow camera to view any objects.
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		
+
 		// The projection matrix.
 		glm::mat4 projection = glm::mat4(1.0f);
 		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-		
+
 		// Send matrices to shader. This is typically done as transformations tend to change frequently.
 //		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
 //		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		
+
 		int viewLoc = glGetUniformLocation(ourShader.ID, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		
+
 		int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		
+
 		// Render boxes
 		glBindVertexArray(VAO);
 		for (unsigned int i = 0; i < 10; i++) {
@@ -426,14 +426,14 @@ int main() {
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		
+
 		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-		
+
 		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		
+
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-		
+
 		glfwSwapBuffers(window); // Swaps color buffer.
 		glfwPollEvents(); // Checks if any events are triggered.
 	}
@@ -442,7 +442,7 @@ int main() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 //	glDeleteBuffers(1, &EBO);
-	
+
 	// Terminate GLFW and relieve all allocated GLFW resources.
 	glfwTerminate();
 	return 0;
