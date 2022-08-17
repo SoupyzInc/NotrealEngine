@@ -1,27 +1,27 @@
-#include <direct.h>
 #include <climits>
-#include <iostream>
 #include <cstring>
+#include <direct.h>
+#include <iomanip>
+#include <iostream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iomanip>
 
-#include "lib/GLM/glm.hpp"
-#include "lib/GLM/gtc/matrix_transform.hpp"
-#include "lib/GLM/gtc/type_ptr.hpp"
+#include "../lib/GLM/glm.hpp"
+#include "../lib/GLM/gtc/matrix_transform.hpp"
+#include "../lib/GLM/gtc/type_ptr.hpp"
 
-#include "Shaders/shader.h"
+#include "../shaders/shader.h"
 #include "stb_image.h"
 
 using namespace std;
+
+float mixValue = 0.2f;
 
 // Adjust viewport to resize with window resizes.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
-
-float mixValue = 0.2f;
 
 // Handles key inputs during program execution.
 void processInput(GLFWwindow *window) {
@@ -65,7 +65,7 @@ int main() {
 	
 	// Error handling for failed window creation.
 	if (window == nullptr) {
-		std::cout << "Failed to create GLFW window" << std::endl;
+		std::cout << "ERROR::GLFW::WINDOW_CREATION_FAILED" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
@@ -77,7 +77,7 @@ int main() {
 	// GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling
 	// any OpenGL functions.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		std::cout << "ERROR::GLAD::INITIALIZATION_FAILED" << std::endl;
 		return -1;
 	}
 	
@@ -96,60 +96,20 @@ int main() {
 	_getcwd(buff, PATH_MAX);
 	string current_working_dir(buff);
 	current_working_dir = current_working_dir.substr(0, 43);
-
-	// Create file directory prefixes for shaders.
-	const string PREFIX = current_working_dir + "Shaders\\";
 	
-	// Char[] for vertex shader directory.
-	char VERTEX_SHADER_DIR[PREFIX.size() + strlen("vertexShader.glsl")];
-	strcpy(VERTEX_SHADER_DIR, (PREFIX + "vertexShader.glsl").c_str());
+	// char[] for vertex shader directory.
+	char VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\vertexShader.glsl")];
+	strcpy(VERTEX_SHADER_DIR, (current_working_dir + "shaders\\vertexShader.glsl").c_str());
 	
-	// Char[] for fragment shader directory.
-	char FRAGMENT_SHADER_DIR[PREFIX.size() + strlen("fragmentShader.glsl")];
-	strcpy(FRAGMENT_SHADER_DIR, (PREFIX + "fragmentShader.glsl").c_str());
+	// char[] for fragment shader directory.
+	char FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\fragmentShader.glsl")];
+	strcpy(FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\fragmentShader.glsl").c_str());
 	
 	// Create shader.
 	Shader ourShader(VERTEX_SHADER_DIR, FRAGMENT_SHADER_DIR);
 #pragma endregion
 
 #pragma region User Defined Shapes
-// My Prism Thing
-//	float vertices[] = {
-//		// Pos (xyz)       // Col (rgb)
-//		0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // top
-//		-0.2f, -0.1f, 0.0f, 0.0f, 1.0f, 0.0f, // left
-//		0.2f, -0.1f, 0.0f, 0.0f, 0.0f, 1.0f, // right
-//		0.0f, -0.4f, 0.0f, 1.0f, 1.0f, 1.0f  // bottom
-//	};
-//
-//	unsigned int indices[] = {  // note that we start from 0!
-//		0, 2, 3,   // front left
-//		0, 1, 3    // front right
-//	};
-
-// Rectangle of 2 triangles
-//	float vertices[] = {
-//		// positions          // colors           // texture coords
-//		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-//		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-//		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-//		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
-//	};
-
-	// Example of nonfilled textured areas.
-//	float vertices[] = {
-//		// positions          // colors           // texture coords
-//		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.5f, 1.5f,   // top right
-//		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.5f, -0.5f,   // bottom right
-//		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   -0.5f, -0.5f,   // bottom left
-//		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   -0.5f, 1.5f    // top left
-//	};
-
-//	unsigned int indices[] = {
-//		0, 1, 3, // first triangle
-//		1, 2, 3  // second triangle
-//	};
-
 	float vertices[] = {
 		// Positions        	// Colors           // Texture Coords
 		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
@@ -196,16 +156,16 @@ int main() {
 	};
 	
 	glm::vec3 cubePositions[] = {
-		glm::vec3( 0.0f,  0.0f,  0.0f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3( 1.3f, -2.0f, -2.5f),
-		glm::vec3( 1.5f,  2.0f, -2.5f),
-		glm::vec3( 1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f),
+		glm::vec3( 0.0f,  0.0f,   0.0f),
+		glm::vec3(-1.7f,  3.0f,  -7.5f),
+		glm::vec3( 1.3f, -2.0f,  -2.5f),
+		glm::vec3( 1.5f,  2.0f,  -2.5f),
+		glm::vec3( 1.5f,  0.2f,  -1.5f),
+		glm::vec3(-1.3f,  1.0f,  -1.5f),
 		glm::vec3( 2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-1.5f, -2.2f,  -2.5f),
 		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3( 2.4f, -0.4f, -3.5f)
+		glm::vec3( 2.4f, -0.4f,  -3.5f)
 	};
 #pragma endregion
 
@@ -279,15 +239,15 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Load image data.
-	char TEXTURE1_DIR[current_working_dir.size() + strlen(R"(Textures\container.jpg)")];
-	strcpy(TEXTURE1_DIR, (current_working_dir + R"(Textures\container.jpg)").c_str());
+	char TEXTURE1_DIR[current_working_dir.size() + strlen(R"(textures\container.jpg)")];
+	strcpy(TEXTURE1_DIR, (current_working_dir + R"(textures\container.jpg)").c_str());
 	unsigned char *data = stbi_load(TEXTURE1_DIR, &width, &height, &nrChannels, 0);
 
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	} else {
-		cout << " Failed to load texture 1." << endl;
+		cout << "ERROR::TEXTURE::DATA_NOT_SUCCESSFULLY_LOADED\nAttempted to load texture from " << TEXTURE1_DIR << endl;
 	}
 
 	stbi_image_free(data); // Free memory.
@@ -310,14 +270,14 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Load image data.
-	char TEXTURE2_DIR[current_working_dir.size() + strlen(R"(Textures\awesomeface.png)")];
-	strcpy(TEXTURE2_DIR, (current_working_dir + R"(Textures\awesomeface.png)").c_str());
+	char TEXTURE2_DIR[current_working_dir.size() + strlen(R"(textures\awesomeface.png)")];
+	strcpy(TEXTURE2_DIR, (current_working_dir + R"(textures\awesomeface.png)").c_str());
 	data = stbi_load(TEXTURE2_DIR, &width, &height, &nrChannels, 0);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	} else {
-		cout << " Failed to load texture 2." << endl;
+		cout << "ERROR::TEXTURE::DATA_NOT_SUCCESSFULLY_LOADED\nAttempted to load texture from " << TEXTURE2_DIR << endl;
 	}
 
 	stbi_image_free(data); // Free memory.
@@ -329,35 +289,31 @@ int main() {
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
 
-	double timeNow = 0.0;
+	double timeNow;
 	double timePrev = 0.0;
-	double delTime = 0.0;
+	
+	unsigned int averageFps;
 	unsigned int frames = 0;
-	unsigned int averageFps = 0;
 	unsigned int counter = 1;
+	
 	double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	cout.setf(ios::fixed);
-	cout.setf(ios::showpoint);
-	cout.precision(2);
-
 	// Render loop
+	// -----------
 	while (!glfwWindowShouldClose(window)) {
 		frames++;
 		timeNow = round(glfwGetTime() * 100); // Use 2 decimal places of accuracy
-		delTime = timeNow - timePrev;
 
-		if (delTime == 100) { // If exactly one second has passed.
+		if (timeNow - timePrev == 100) { // If approximately one second has passed.
 			FPSs[counter - 1] = frames;
-
+			
 			if (counter % 10 == 0) {
 				counter = 0;
 			}
 
 			averageFps = round((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
-
-			string FPS = to_string(frames);
-			string newTitle = "Notreal Engine | " + FPS + " FPS/" + to_string(averageFps) + " AFPS";
+			
+			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			frames = 0;

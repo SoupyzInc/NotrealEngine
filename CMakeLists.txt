@@ -3,16 +3,39 @@ project(NotrealEngine)
 
 set(CMAKE_CXX_STANDARD 14)
 
+# Dependencies
+# ============
 include_directories(lib/STB) # STB header files
-include_directories(${PROJECT_SOURCE_DIR}/lib/GLAD/include) # Include GLAD header files
-include_directories(${PROJECT_SOURCE_DIR}/lib/GLFW/glfw-3.3.7/include) # GLFW header files
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/GLFW/glfw-3.3.7) # GLFW CMakeList.txt
-include_directories(${PROJECT_SOURCE_DIR}/lib/GLM) # GLM header files
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/GLM) # GLM CMakeList.txt
+include_directories(lib/GLAD/include) # Include GLAD header files
+include_directories(lib/GLFW/glfw-3.3.7/include) # GLFW header files
+add_subdirectory(lib/GLFW/glfw-3.3.7) # GLFW CMakeList.txt
+include_directories(lib/GLM) # GLM header files
 
-add_executable(NotrealEngine main.cpp lib/GLAD/glad.c Shaders/shader.h lib/STB/stb_image.h lib/STB/stb_image.cpp)
-#add_executable(NotrealEngine test.cpp lib/GLAD/glad.c Shaders/shader.h lib/STB/stb_image.h lib/STB/stb_image.cpp)
+# Build Executable
+# ================
+set(testMode OFF)
 
-#target_link_libraries(NotrealEngine -lOpenGL32 -lfreeGLUT) # GLUT
+if (NOT testMode)
+    message(STATUS "Value testMode is set to OFF. Using src/main.cpp as entry.")
+    add_executable(NotrealEngine
+        src/main.cpp
+            lib/GLAD/glad.c
+        shaders/shader.h
+            lib/STB/stb_image.h
+            lib/STB/stb_image.cpp
+    )
+else()
+    message(STATUS "Value testMode is set to ON. Using src/test.cpp as entry.")
+    add_executable(NotrealEngine
+        src/test.cpp
+            lib/GLAD/glad.c
+        shaders/shader.h
+            lib/STB/stb_image.h
+            lib/STB/stb_image.cpp
+    )
+endif()
+
+# Link Libraries
+# ==============
 target_link_libraries(NotrealEngine -lOpenGL32 -lglu32) # OpenGL
 target_link_libraries(NotrealEngine glfw) # GLFW
