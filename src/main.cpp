@@ -289,8 +289,8 @@ int main() {
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
 
-	double timeNow;
-	double timePrev = 0.0;
+	unsigned int timeNow;
+	unsigned int timePrev = 0.0;
 	
 	unsigned int averageFps;
 	unsigned int frames = 0;
@@ -302,18 +302,24 @@ int main() {
 	// -----------
 	while (!glfwWindowShouldClose(window)) {
 		frames++;
-		timeNow = round(glfwGetTime() * 100); // Use 2 decimal places of accuracy
+		timeNow = static_cast<unsigned int>(glfwGetTime() * 100); // Use 1 decimal places of accuracy
 
-		if (timeNow - timePrev == 100) { // If approximately one second has passed.
+        // Skipped second due to low TPS or window interruption.
+        if (timeNow / 100 - timePrev / 100 > 1) {
+            timePrev = timeNow;
+        }
+
+        // If approximately one second has passed.
+		if (timeNow - timePrev == 100) {
 			FPSs[counter - 1] = frames;
 			
 			if (counter % 10 == 0) {
 				counter = 0;
 			}
 
-			averageFps = round((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
+			averageFps = static_cast<unsigned int>((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
 			
-			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS";
+			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS | " + to_string(timeNow / 100) + "s";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			frames = 0;
