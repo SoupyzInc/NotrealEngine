@@ -17,6 +17,13 @@ using namespace std;
 
 float mixValue = 0.2f;
 
+double deltaTime = 0.0f;	// Time between current frame and last frame
+double lastFrame = 0.0f; // Time of last frame
+
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
 // Adjust viewport to resize with window resizes.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -29,6 +36,20 @@ void processInput(GLFWwindow *window) {
 		glfwSetWindowShouldClose(window, true);
 	}
 	
+	// Camera Function
+	// ---------------
+	auto cameraSpeed = static_cast<float>(2.5f * deltaTime); // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	
+	// Debug
+	// -----
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	} else {
@@ -37,13 +58,13 @@ void processInput(GLFWwindow *window) {
 
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		if (mixValue < 1.0f) {
-			mixValue += 0.0005f;
+			mixValue += static_cast<float>(2.5f * deltaTime);
 		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		if (mixValue > 0.0f) {
-			mixValue -= 0.0005f;
+			mixValue -= static_cast<float>(2.5f * deltaTime);
 		}
 	}
 }
@@ -60,7 +81,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	// Create window
-	GLFWwindow *window = glfwCreateWindow(800, 600, "Notreal Engine", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(800, 600, "Notreal Engine | Loading debug information...", nullptr, nullptr);
 	
 	// Error handling for failed window creation.
 	if (window == nullptr) {
@@ -288,8 +309,8 @@ int main() {
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
 
-	unsigned int timeNow;
-	unsigned int timePrev = 0.0;
+	double currentFrame;
+	unsigned int timePrev = 0;
 	
 	unsigned int averageFps;
 	unsigned int frames = 0;
@@ -300,10 +321,16 @@ int main() {
 	// Render loop
 	// -----------
 	while (!glfwWindowShouldClose(window)) {
+		// FPS Debug Information
+		// ---------------------
 		frames++;
-		timeNow = static_cast<unsigned int>(glfwGetTime() * 100); // Use 1 decimal places of accuracy
-
-        // Skipped second due to low TPS or window interruption.
+		currentFrame = glfwGetTime(); // Use 1 decimal places of accuracy
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		
+		auto timeNow = static_cast<unsigned int>(currentFrame * 100);
+		
+		// Skipped second due to low TPS or window interruption.
         if (timeNow / 100 - timePrev / 100 > 1) {
             timePrev = timeNow;
         }
@@ -318,7 +345,7 @@ int main() {
 
 			averageFps = static_cast<unsigned int>((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
 			
-			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS | " + to_string(timeNow / 100) + "s";
+			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS | " + to_string(deltaTime) + " SPF | " +to_string(timeNow / 100) + "s";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			frames = 0;
@@ -345,23 +372,25 @@ int main() {
 
 		// Create Transformations
 		// ----------------------
+//		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f); // Where the camera is in world space.
+//		glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); // Where the camera is looking at in world space.
+//		glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget); // The vector that shows where the camera is pointing.
+//
+//		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up in world space.
+//		glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection)); // Camera's positive x-axis.
+//		glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+		
 		// The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
 		glm::mat4 model = glm::mat4(1.0f);
-//		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate plane by rotating on the x-axis, so it is laying on the "floor."
-//		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		// The view matrix.
 		glm::mat4 view = glm::mat4(1.0f);
-		// Move scene away from origin (towards -z) to allow camera to view any objects.
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		// Use LookAt matrix to find where to move the world.
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		// The projection matrix.
 		glm::mat4 projection = glm::mat4(1.0f);
 		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-		// Send matrices to shader. This is typically done as transformations tend to change frequently.
-//		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-//		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		int viewLoc = glGetUniformLocation(ourShader.ID, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
@@ -382,16 +411,12 @@ int main() {
 				model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 			}
 
+			// Send matrices to shader. This is typically done as transformations tend to change frequently.
 			int modelLoc = glGetUniformLocation(ourShader.ID, "model");
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-
-		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
-
-		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
