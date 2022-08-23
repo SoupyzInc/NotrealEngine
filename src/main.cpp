@@ -17,12 +17,14 @@ using namespace std;
 
 float mixValue = 0.2f;
 
-double deltaTime = 0.0f;	// Time between current frame and last frame
-double lastFrame = 0.0f; // Time of last frame
+double deltaTime = 0.0f; // Time between current frame and last frame in seconds.
+double lastFrame = 0.0f; // Time of last frame.
 
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
+glm::vec3 lightPos    = glm::vec3(1.2f, 1.0f,  2.0f);
 
 // Adjust viewport to resize with window resizes.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -39,14 +41,18 @@ void processInput(GLFWwindow *window) {
 	// Camera Function
 	// ---------------
 	auto cameraSpeed = static_cast<float>(2.5f * deltaTime); // adjust accordingly
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * cameraFront;
+    }
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
 	
 	// Debug
 	// -----
@@ -111,6 +117,8 @@ int main() {
 #pragma endregion
 
 #pragma region Shaders
+    // Shaders
+    // -------
 	// Get current working directory.
 	char buff[PATH_MAX];
 	_getcwd(buff, PATH_MAX);
@@ -127,6 +135,18 @@ int main() {
 	
 	// Create shader.
 	Shader ourShader(VERTEX_SHADER_DIR, FRAGMENT_SHADER_DIR);
+
+    // Lighting Shaders
+    // ----------------
+    // char[] for lighting vertex shader directory.
+    char LIGHTING_VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lighting.vs")];
+    strcpy(LIGHTING_VERTEX_SHADER_DIR, (current_working_dir + "shaders\\lighting.vs").c_str());
+
+    // char[] for lighting fragment shader directory.
+    char LIGHTING_FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lighting.fs")];
+    strcpy(LIGHTING_FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\lighting.fs").c_str());
+
+    Shader lightingShader(LIGHTING_VERTEX_SHADER_DIR, LIGHTING_FRAGMENT_SHADER_DIR);
 #pragma endregion
 
 #pragma region User Defined Shapes
@@ -139,53 +159,53 @@ int main() {
 		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
 		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
 
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f
+//		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+//		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+//		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+//		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+//
+//		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+//		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+//		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//
+//		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+//		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+//		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//
+//		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+//		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+//		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//
+//		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+//		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
+//		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+//		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+//		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f
 	};
 	
 	glm::vec3 cubePositions[] = {
 		glm::vec3( 0.0f,  0.0f,   0.0f),
-		glm::vec3(-1.7f,  3.0f,  -7.5f),
-		glm::vec3( 1.3f, -2.0f,  -2.5f),
-		glm::vec3( 1.5f,  2.0f,  -2.5f),
-		glm::vec3( 1.5f,  0.2f,  -1.5f),
-		glm::vec3(-1.3f,  1.0f,  -1.5f),
-		glm::vec3( 2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f,  -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3( 2.4f, -0.4f,  -3.5f)
+//		glm::vec3(-1.7f,  3.0f,  -7.5f),
+//		glm::vec3( 1.3f, -2.0f,  -2.5f),
+//		glm::vec3( 1.5f,  2.0f,  -2.5f),
+//		glm::vec3( 1.5f,  0.2f,  -1.5f),
+//		glm::vec3(-1.3f,  1.0f,  -1.5f),
+//		glm::vec3( 2.0f,  5.0f, -15.0f),
+//		glm::vec3(-1.5f, -2.2f,  -2.5f),
+//		glm::vec3(-3.8f, -2.0f, -12.3f),
+//		glm::vec3( 2.4f, -0.4f,  -3.5f)
 	};
 #pragma endregion
 
@@ -220,6 +240,19 @@ int main() {
 	// Set vertex color attribute pointers.
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+    // Generate Light VAO
+    // ------------------
+    unsigned int lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+
+    // Only VBO needs to be bound, the container's VBO data already has the needed data.
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // Set vertex attributes.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(0);
 	
 	// Generate EBO
 	// ------------
@@ -309,14 +342,14 @@ int main() {
 	ourShader.setInt("texture1", 0); // With shader class
 	ourShader.setInt("texture2", 1);
 
-	double currentFrame;
-	unsigned int timePrev = 0;
+	double currentFrame; // Time of current frame in seconds.
+	unsigned int timePrev = 0; // Time of last frame rounded to two decimals.
 	
-	unsigned int averageFps;
-	unsigned int frames = 0;
-	unsigned int counter = 1;
+	unsigned int averageFps; // The average FPS over last 10 seconds.
+	unsigned int frames = 0; // How many frames have passed in one second.
+	unsigned int counter = 1; // Index of FPSs.
 	
-	double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Stores FPSs over last 10 seconds to calculate SMA10.
 
 	// Render loop
 	// -----------
@@ -324,15 +357,15 @@ int main() {
 		// FPS Debug Information
 		// ---------------------
 		frames++;
-		currentFrame = glfwGetTime(); // Use 1 decimal places of accuracy
+		currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		
-		auto timeNow = static_cast<unsigned int>(currentFrame * 100);
+		auto timeNow = static_cast<unsigned int>(currentFrame * 100); // Use 2 decimal places of accuracy.
 		
 		// Skipped second due to low TPS or window interruption.
         if (timeNow / 100 - timePrev / 100 > 1) {
-            timePrev = timeNow;
+            timePrev = timeNow; // Reset second check cycle.
         }
 
         // If approximately one second has passed.
@@ -359,6 +392,12 @@ int main() {
 		// ------------------
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Shading
+        // -------
+        lightingShader.use();
+        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
 		
 		// Bind Textures
 		// -------------
@@ -367,7 +406,7 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
-		
+
 		ourShader.setFloat("mixValue", mixValue); // Mix textures
 
 		// Create Transformations
@@ -400,7 +439,7 @@ int main() {
 
 		// Render boxes
 		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 10; i++) {
+		for (unsigned int i = 0; i < 1; i++) {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
