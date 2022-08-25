@@ -34,7 +34,7 @@ glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
-glm::vec3 lightPos    = glm::vec3(1.5f, 0.75f, 0.0f);
+glm::vec3 lightPos    = glm::vec3(1.0f, 2.0f, 0.0f);
 
 // Adjust viewport to resize with window resizes.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -177,16 +177,16 @@ int main() {
 	string current_working_dir(buff);
 	current_working_dir = current_working_dir.substr(0, 43);
 	
-	// char[] for vertex shader directory.
-	char VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\vertexShader.glsl")];
-	strcpy(VERTEX_SHADER_DIR, (current_working_dir + "shaders\\vertexShader.glsl").c_str());
-	
-	// char[] for fragment shader directory.
-	char FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\fragmentShader.glsl")];
-	strcpy(FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\fragmentShader.glsl").c_str());
-	
-	// Create shader.
-	Shader ourShader(VERTEX_SHADER_DIR, FRAGMENT_SHADER_DIR);
+//	// char[] for vertex shader directory.
+//	char VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\vertexShader.glsl")];
+//	strcpy(VERTEX_SHADER_DIR, (current_working_dir + "shaders\\vertexShader.glsl").c_str());
+//
+//	// char[] for fragment shader directory.
+//	char FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\fragmentShader.glsl")];
+//	strcpy(FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\fragmentShader.glsl").c_str());
+//
+//	// Create shader.
+//	Shader ourShader(VERTEX_SHADER_DIR, FRAGMENT_SHADER_DIR);
 
     // Lighting Shaders
     // ----------------
@@ -210,53 +210,53 @@ int main() {
     char LIGHT_CUBE_FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lightCube.fs")];
     strcpy(LIGHT_CUBE_FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\lightCube.fs").c_str());
 
-    Shader lightCubeShader(LIGHT_CUBE_VERTEX_SHADER_DIR, LIGHTING_FRAGMENT_SHADER_DIR);
+    Shader lightCubeShader(LIGHT_CUBE_VERTEX_SHADER_DIR, LIGHT_CUBE_FRAGMENT_SHADER_DIR);
 #pragma endregion
 
 #pragma region User Defined Shapes
 	float vertices[] = {
-		// Positions        	// Colors           // Texture Coords
-        -0.5f, -0.5f, -0.5f,    1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,    1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		// Positions        	// Normals
+        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
 
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
 
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, 	-1.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, 	-1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 	-1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 	-1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 	-1.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 	-1.0f, 0.0f, 0.0f,
 
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,
 
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, 	0.0f, -1.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f, 	0.0f, -1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 	0.0f, -1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f, 	0.0f, -1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f, 	0.0f, -1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 	0.0f, -1.0f, 0.0f,
 
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,	0.0f,  1.0f
+		-0.5f,  0.5f, -0.5f, 	0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f, 	0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 	0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f, 	0.0f, 1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, 	0.0f, 1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, 	0.0f, 1.0f, 0.0f
 	};
 	
 	glm::vec3 cubePositions[] = {
@@ -293,8 +293,12 @@ int main() {
     glBindVertexArray(VAO); // Bind VAO
 
     // Set vertex position attribute pointers.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)nullptr);
     glEnableVertexAttribArray(0);
+
+    // Set normal attribute pointers.
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Generate Light VAO
     // ------------------
@@ -306,7 +310,7 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     // Set vertex attributes.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)nullptr);
     glEnableVertexAttribArray(0);
 
     // Generate EBO
@@ -448,14 +452,8 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Shading
-        // -------
-        lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
-		
-		// Bind Textures
-		// -------------
+        // Bind Textures
+        // -------------
 //		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 //		glActiveTexture(GL_TEXTURE0);
 //		glBindTexture(GL_TEXTURE_2D, texture1);
@@ -463,6 +461,14 @@ int main() {
 //		glBindTexture(GL_TEXTURE_2D, texture2);
 //
 //		ourShader.setFloat("mixValue", mixValue); // Mix textures
+
+        // Shading
+        // -------
+        lightingShader.use();
+        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        lightingShader.setVec3("lightColor",  0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("lightPos", lightPos);
+        lightingShader.setVec3("viewPos", cameraPos);
 
         // The projection matrix.
         glm::mat4 projection = glm::perspective(glm::radians(fov), static_cast<float>(WIDTH) / static_cast<float>(HEIGHT), 0.01f, 100.0f);
@@ -474,8 +480,10 @@ int main() {
 
         // The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-0.5f, 0.0f, -2.0f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(5.0f, -0.025f, 5.0f));
+//        model = glm::translate(model, glm::vec3(-0.5f, 0.0f, -2.0f));
+//        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
         lightingShader.setMat4("model", model);
 
         // Draw cube object.
@@ -484,8 +492,7 @@ int main() {
 
         // Draw light cube.
         lightCubeShader.use();
-        lightCubeShader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-        lightCubeShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
@@ -503,7 +510,8 @@ int main() {
 	
 	// Relieve buffers.
 	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &lightVAO);
+    glDeleteBuffers(1, &VBO);
 //	glDeleteBuffers(1, &EBO);
 
 	// Terminate GLFW and relieve all allocated GLFW resources.
