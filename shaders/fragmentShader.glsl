@@ -1,8 +1,8 @@
 #version 330 core
-out vec4 FragColor;
-
 in vec3 ourColor;
 in vec2 TexCoord;
+
+out vec4 FragColor;
 
 uniform float mixValue;
 uniform sampler2D texture1;

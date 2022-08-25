@@ -21,7 +21,7 @@ const unsigned int HEIGHT = 900 * 1.5;
 float mixValue = 0.2f;
 
 bool firstMouse = true;
-float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float yaw   = -90.0f;
 float pitch =  0.0f;
 float lastX =  static_cast<float>(WIDTH) / 2.0;
 float lastY =  static_cast<float>(HEIGHT) / 2.0;
@@ -86,29 +86,31 @@ void processInput(GLFWwindow *window) {
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw   += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
+	if (firstMouse) {
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+	
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+	
+	float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+	
+	yaw += xoffset;
+	pitch += yoffset;
+	
+	if (pitch > 89.0f) {
+		pitch = 89.0f;
+	}
+	
+	if (pitch < -89.0f) {
+		pitch = -89.0f;
+	}
 
     glm::vec3 direction;
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -118,11 +120,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    fov -= (float)yoffset;
-    if (fov < 1.0f)
-        fov = 1.0f;
-    if (fov > 45.0f)
-        fov = 45.0f;
+	fov -= (float)yoffset;
+	if (fov < 1.0f) {
+		fov = 1.0f;
+	}
+	
+	if (fov > 45.0f) {
+		fov = 45.0f;
+	}
 }
 
 int main() {
@@ -176,17 +181,6 @@ int main() {
 	_getcwd(buff, PATH_MAX);
 	string current_working_dir(buff);
 	current_working_dir = current_working_dir.substr(0, 43);
-	
-//	// char[] for vertex shader directory.
-//	char VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\vertexShader.glsl")];
-//	strcpy(VERTEX_SHADER_DIR, (current_working_dir + "shaders\\vertexShader.glsl").c_str());
-//
-//	// char[] for fragment shader directory.
-//	char FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\fragmentShader.glsl")];
-//	strcpy(FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\fragmentShader.glsl").c_str());
-//
-//	// Create shader.
-//	Shader ourShader(VERTEX_SHADER_DIR, FRAGMENT_SHADER_DIR);
 
     // Lighting Shaders
     // ----------------
@@ -215,61 +209,48 @@ int main() {
 
 #pragma region User Defined Shapes
 	float vertices[] = {
-		// Positions        	// Normals
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
-		-0.5f,  0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f,    0.0f, 0.0f, -1.0f,
-
-		-0.5f, -0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, 	0.0f, 0.0f,  1.0f,
-
-		-0.5f,  0.5f,  0.5f, 	-1.0f, 0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, 	-1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 	-1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 	-1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f, 	-1.0f, 0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, 	-1.0f, 0.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f, 	1.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 	1.0f, 0.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f, 	0.0f, -1.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f, 	0.0f, -1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f, 	0.0f, -1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f, 	0.0f, -1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f, 	0.0f, -1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 	0.0f, -1.0f, 0.0f,
-
-		-0.5f,  0.5f, -0.5f, 	0.0f, 1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f, 	0.0f, 1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 	0.0f, 1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f, 	0.0f, 1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, 	0.0f, 1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, 	0.0f, 1.0f, 0.0f
-	};
-	
-	glm::vec3 cubePositions[] = {
-		glm::vec3( -5.0f,  0.0f, -5.0f)
-//		glm::vec3(-1.7f,  3.0f,  -7.5f),
-//		glm::vec3( 1.3f, -2.0f,  -2.5f),
-//		glm::vec3( 1.5f,  2.0f,  -2.5f),
-//		glm::vec3( 1.5f,  0.2f,  -1.5f),
-//		glm::vec3(-1.3f,  1.0f,  -1.5f),
-//		glm::vec3( 2.0f,  5.0f, -15.0f),
-//		glm::vec3(-1.5f, -2.2f,  -2.5f),
-//		glm::vec3(-3.8f, -2.0f, -12.3f),
-//		glm::vec3( 2.4f, -0.4f,  -3.5f)
+		// Positions        	 // Normals
+        -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+  
+		-0.5f, -0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
+ 
+		-0.5f,  0.5f,  0.5f, 	-1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, 	-1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, 	-1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, 	-1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, 	-1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, 	-1.0f,  0.0f,  0.0f,
+ 
+		 0.5f,  0.5f,  0.5f, 	 1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f, 	 1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f, 	 1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f, 	 1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f, 	 1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	 1.0f,  0.0f,  0.0f,
+  
+		-0.5f, -0.5f, -0.5f, 	 0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f, 	 0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f, 	 0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f, 	 0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, 	 0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, 	 0.0f, -1.0f,  0.0f,
+  
+		-0.5f,  0.5f, -0.5f, 	 0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f, 	 0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	 0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f, 	 0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, 	 0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, 	 0.0f,  1.0f,  0.0f
 	};
 #pragma endregion
 
@@ -312,95 +293,8 @@ int main() {
     // Set vertex attributes.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)nullptr);
     glEnableVertexAttribArray(0);
-
-    // Generate EBO
-	// ------------
-//	unsigned int EBO;
-//	glGenBuffers(1, &EBO);
-//
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+#pragma endregion
 	
-	// Textures
-	// --------
-	// Set vertex texture attribute pointers.
-//	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-//	glEnableVertexAttribArray(2);
-//
-//	glEnable(GL_BLEND); // Enable blending.
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Allow transparency to work with PNGs.
-#pragma endregion
-
-#pragma region User Defined Textures
-//	unsigned int texture1, texture2;
-//	int width, height, nrChannels;
-//
-//	// Texture 1
-//	// ---------
-//	glGenTextures(1, &texture1); // Set ID to texture.
-//	glBindTexture(GL_TEXTURE_2D, texture1);
-//
-//	// Set texture wrapping and filtering.
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-//
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use more pixelated filtering to scale down.
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use more blurry filtering to scale up.
-//
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//
-//	// Load image data.
-//	char TEXTURE1_DIR[current_working_dir.size() + strlen(R"(textures\container.jpg)")];
-//	strcpy(TEXTURE1_DIR, (current_working_dir + R"(textures\container.jpg)").c_str());
-//	unsigned char *data = stbi_load(TEXTURE1_DIR, &width, &height, &nrChannels, 0);
-//
-//	if (data) {
-//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-//		glGenerateMipmap(GL_TEXTURE_2D);
-//	} else {
-//		cout << "ERROR::TEXTURE::DATA_NOT_SUCCESSFULLY_LOADED\nAttempted to load texture from " << TEXTURE1_DIR << endl;
-//	}
-//
-//	stbi_image_free(data); // Free memory.
-//
-//	// Texture 2
-//	// ---------
-//	stbi_set_flip_vertically_on_load(true); // From here on, tell stb_image.h to flip loaded textures on y-axis (only flip texture 2).
-//
-//	glGenTextures(1, &texture2); // Set ID to texture.
-//	glBindTexture(GL_TEXTURE_2D, texture2);
-//
-//	// Set texture wrapping and filtering.
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use more pixelated filtering to scale down.
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use more blurry filtering to scale up.
-//
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//
-//	// Load image data.
-//	char TEXTURE2_DIR[current_working_dir.size() + strlen(R"(textures\awesomeface.png)")];
-//	strcpy(TEXTURE2_DIR, (current_working_dir + R"(textures\awesomeface.png)").c_str());
-//	data = stbi_load(TEXTURE2_DIR, &width, &height, &nrChannels, 0);
-//	if (data) {
-//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-//		glGenerateMipmap(GL_TEXTURE_2D);
-//	} else {
-//		cout << "ERROR::TEXTURE::DATA_NOT_SUCCESSFULLY_LOADED\nAttempted to load texture from " << TEXTURE2_DIR << endl;
-//	}
-//
-//	stbi_image_free(data); // Free memory.
-#pragma endregion
-
-//	ourShader.use(); // Activate our shader before use.
-//
-//	// Tell OpenGL which texture unit each shader sampler belongs to.
-//	ourShader.setInt("texture1", 0); // With shader class
-//	ourShader.setInt("texture2", 1);
-
 	double currentFrame; // Time of current frame in seconds.
 	unsigned int timePrev = 0; // Time of last frame rounded to two decimals.
 	
@@ -452,16 +346,6 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Bind Textures
-        // -------------
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//		glActiveTexture(GL_TEXTURE0);
-//		glBindTexture(GL_TEXTURE_2D, texture1);
-//		glActiveTexture(GL_TEXTURE1);
-//		glBindTexture(GL_TEXTURE_2D, texture2);
-//
-//		ourShader.setFloat("mixValue", mixValue); // Mix textures
-
         // Shading
         // -------
         lightingShader.use();
@@ -482,8 +366,6 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(5.0f, -0.025f, 5.0f));
-//        model = glm::translate(model, glm::vec3(-0.5f, 0.0f, -2.0f));
-//        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
         lightingShader.setMat4("model", model);
 
         // Draw cube object.
@@ -512,7 +394,6 @@ int main() {
 	glDeleteVertexArrays(1, &VAO);
     glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
-//	glDeleteBuffers(1, &EBO);
 
 	// Terminate GLFW and relieve all allocated GLFW resources.
 	glfwTerminate();
