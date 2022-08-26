@@ -1,4 +1,5 @@
 #include <climits>
+#include <cstring>
 #include <direct.h>
 #include <iomanip>
 #include <iostream>
