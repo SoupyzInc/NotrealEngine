@@ -19,20 +19,21 @@ if (NOT testMode)
     message(STATUS "Value testMode is set to OFF. Using src/main.cpp as entry.")
     add_executable(NotrealEngine
         src/main.cpp
-            lib/GLAD/glad.c
+        lib/GLAD/glad.c
         shaders/shader.h
-            lib/STB/stb_image.h
-            lib/STB/stb_image.cpp
+        lib/STB/stb_image.h
+        lib/STB/stb_image.cpp
+        lib/camera/camera.h
     )
 else()
     message(STATUS "Value testMode is set to ON. Using src/test.cpp as entry.")
     add_executable(NotrealEngine
         src/test.cpp
-            lib/GLAD/glad.c
+        lib/GLAD/glad.c
         shaders/shader.h
-            lib/STB/stb_image.h
-            lib/STB/stb_image.cpp
-    )
+        lib/STB/stb_image.h
+        lib/STB/stb_image.cpp
+        lib/camera/camera.h)
 endif()
 
 # Link Libraries
