@@ -30,7 +30,7 @@ bool firstMouse = true;
 double deltaTime = 0.0f; // Time between current frame and last frame in seconds.
 double lastFrame = 0.0f; // Time of last frame.
 
-glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+const glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
 // Adjust viewport to resize with window resizes.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -318,9 +318,12 @@ int main() {
 	// ----------------
 	unsigned int diffuseMap = loadTextures("container2.png");
 	unsigned int specularMap = loadTextures("container2_specular.png");
+	unsigned int emissionMap = loadTextures("container2_emission.png");
+	
 	lightingShader.use();
 	lightingShader.setInt("material.diffuse", 0);
 	lightingShader.setInt("material.specular", 1);
+	lightingShader.setInt("material.emission", 2);
 	
 	// Render loop
 	// -----------
@@ -368,7 +371,7 @@ int main() {
         // -------
 		lightingShader.use();
         lightingShader.setVec3("lightPos", lightPos);
-        lightingShader.setVec3("viewPos", camera.Position);
+//        lightingShader.setVec3("viewPos", camera.Position);
 		
 		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
@@ -397,6 +400,9 @@ int main() {
 		
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
+		
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, emissionMap);
 		
 		// Draw cube object.
         glBindVertexArray(VAO);
