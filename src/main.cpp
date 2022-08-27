@@ -79,7 +79,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     }
 
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    float yoffset = lastY - ypos;
 
     lastX = xpos;
     lastY = ypos;
@@ -130,7 +130,6 @@ unsigned int loadTextures(const char *fileName) {
 	}
 	
 	stbi_image_free(data); // Free memory.
-	
 	return textureId;
 }
 
@@ -145,7 +144,7 @@ int main() {
 	// Using core profile (not using backwards compatible features).
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
-	// Create window
+	// Create window.
 	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Notreal Engine | Loading debug information...", nullptr, nullptr);
 	
 	// Error handling for failed window creation.
@@ -161,8 +160,7 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    // GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling
-	// any OpenGL functions.
+    // GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling any OpenGL functions.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "ERROR::GLAD::INITIALIZATION_FAILED" << std::endl;
 		return -1;
@@ -200,11 +198,11 @@ int main() {
 
     // Lighting Shaders
     // ----------------
-    // char[] for lighting vertex shader directory.
+    // char[] for light cube vertex shader directory.
     char LIGHT_CUBE_VERTEX_SHADER_DIR[globalDir.size() + strlen("shaders\\lightCube.vs")];
     strcpy(LIGHT_CUBE_VERTEX_SHADER_DIR, (globalDir + "shaders\\lightCube.vs").c_str());
 
-    // char[] for lighting fragment shader directory.
+    // char[] for light cube fragment shader directory.
     char LIGHT_CUBE_FRAGMENT_SHADER_DIR[globalDir.size() + strlen("shaders\\lightCube.fs")];
     strcpy(LIGHT_CUBE_FRAGMENT_SHADER_DIR, (globalDir + "shaders\\lightCube.fs").c_str());
 
@@ -349,10 +347,13 @@ int main() {
 			if (counter % 10 == 0) {
 				counter = 0;
 			}
-
-			averageFps = static_cast<unsigned int>((FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9]) / 10);
 			
-			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS | " + to_string(deltaTime * 1000) + " MSPF | " +to_string(timeNow / 100) + "S";
+			averageFps = static_cast<unsigned int>(
+				(FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9])
+					/ 10);
+			
+			string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS | "
+				+ to_string(deltaTime * 1000) + " MSPF | " + to_string(timeNow / 100) + "S";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			frames = 0;
@@ -371,7 +372,6 @@ int main() {
         // -------
 		lightingShader.use();
         lightingShader.setVec3("lightPos", lightPos);
-//        lightingShader.setVec3("viewPos", camera.Position);
 		
 		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
@@ -383,16 +383,19 @@ int main() {
 		// Rendering
 		// ---------
         // The projection matrix.
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), static_cast<float>(WIDTH) / static_cast<float>(HEIGHT), 0.01f, 100.0f);
-        // The view matrix.
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
+												static_cast<float>(WIDTH) / static_cast<float>(HEIGHT),
+												0.01f,
+												100.0f);
+		// The view matrix.
 		glm::mat4 view = camera.GetViewMatrix();
-
-        lightingShader.setMat4("projection", projection);
-        lightingShader.setMat4("view", view);
-
-        // The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
-        glm::mat4 model = glm::mat4(1.0f);
-        lightingShader.setMat4("model", model);
+		
+		lightingShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
+		
+		// The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
+		glm::mat4 model = glm::mat4(1.0f);
+		lightingShader.setMat4("model", model);
 		
 		// Bind textures.
 		glActiveTexture(GL_TEXTURE0);

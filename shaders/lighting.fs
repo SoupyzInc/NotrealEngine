@@ -21,13 +21,10 @@ in vec2 TexCoords;
 
 out vec4 FragColor;
 
-//uniform vec3 viewPos;
 uniform Light light;
 uniform Material material;
 
 void main() {
-//    FragColor = vec4(lightColor * objectColor, 1.0);
-
     // Ambient lighting
     vec3 ambient = light.ambient * texture(material.diffuse, TexCoords).rgb;
 
@@ -47,4 +44,5 @@ void main() {
     vec3 emission = texture(material.emission, TexCoords).rgb;
 
     FragColor = vec4(ambient + diffuse + specular + emission, 1.0);
+//    FragColor = vec4(1.0); // Debug View (all objects white).
 }

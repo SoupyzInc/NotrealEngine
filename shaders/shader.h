@@ -101,13 +101,13 @@ public:
         glDeleteShader(fragment);
     }
 
-    // Activate the shader.
+    // Activates the shader.
     void use() {
         glUseProgram(ID);
     }
 
-    // Utility uniform functions
-    // TODO: Add the rest of the utility
+    // Utility uniform functions.
+    // TODO: Add the rest of the utility functions.
     void setBool(const string &name, bool value) const {
         glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
     }
