@@ -17,6 +17,8 @@
 
 using namespace std;
 
+string globalDir;
+
 const unsigned int WIDTH = 1600 * 1.5;
 const unsigned int HEIGHT = 900 * 1.5;
 
@@ -28,7 +30,7 @@ bool firstMouse = true;
 double deltaTime = 0.0f; // Time between current frame and last frame in seconds.
 double lastFrame = 0.0f; // Time of last frame.
 
-glm::vec3 lightPos = glm::vec3(1.0f, 2.0f, 0.0f);
+glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
 // Adjust viewport to resize with window resizes.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -64,18 +66,6 @@ void processInput(GLFWwindow *window) {
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-
-//	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-//		if (mixValue < 1.0f) {
-//			mixValue += static_cast<float>(2.5f * deltaTime);
-//		}
-//	}
-//
-//	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-//		if (mixValue > 0.0f) {
-//			mixValue -= static_cast<float>(2.5f * deltaTime);
-//		}
-//	}
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
@@ -99,6 +89,49 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+unsigned int loadTextures(const char *fileName) {
+	unsigned int textureId;
+	int width, height, nrChannels;
+	
+	glGenTextures(1, &textureId); // Set ID to texture.
+	
+	// Char[] for vertex shader directory.
+	char TEXTURE1_DIR[globalDir.size() + strlen(R"(Textures\)") + strlen(fileName)];
+	strcpy(TEXTURE1_DIR, (globalDir + R"(Textures\)" + fileName).c_str());
+	unsigned char *data = stbi_load(TEXTURE1_DIR, &width, &height, &nrChannels, 0);
+	
+	if (data) {
+		GLenum format;
+		if (nrChannels == 1) {
+			format = GL_RED;
+		} else if (nrChannels == 3) {
+			format = GL_RGB;
+		} else if (nrChannels == 4) {
+			format = GL_RGBA;
+		}
+		
+		glBindTexture(GL_TEXTURE_2D, textureId);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		
+		// Set texture wrapping and filtering.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use more pixelated filtering to scale down.
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use more blurry filtering to scale up.
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	} else {
+		cout << "Failed to load texture." << endl;
+	}
+	
+	stbi_image_free(data); // Free memory.
+	
+	return textureId;
 }
 
 int main() {
@@ -151,77 +184,77 @@ int main() {
 	char buff[PATH_MAX];
 	_getcwd(buff, PATH_MAX);
 	string current_working_dir(buff);
-	current_working_dir = current_working_dir.substr(0, 43);
-
+	globalDir = current_working_dir.substr(0, 43);
+	
     // Lighting Shaders
     // ----------------
     // char[] for lighting vertex shader directory.
-    char LIGHTING_VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lighting.vs")];
-    strcpy(LIGHTING_VERTEX_SHADER_DIR, (current_working_dir + "shaders\\lighting.vs").c_str());
+    char LIGHTING_VERTEX_SHADER_DIR[globalDir.size() + strlen("shaders\\lighting.vs")];
+    strcpy(LIGHTING_VERTEX_SHADER_DIR, (globalDir + "shaders\\lighting.vs").c_str());
 
     // char[] for lighting fragment shader directory.
-    char LIGHTING_FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lighting.fs")];
-    strcpy(LIGHTING_FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\lighting.fs").c_str());
+    char LIGHTING_FRAGMENT_SHADER_DIR[globalDir.size() + strlen("shaders\\lighting.fs")];
+    strcpy(LIGHTING_FRAGMENT_SHADER_DIR, (globalDir + "shaders\\lighting.fs").c_str());
 
     Shader lightingShader(LIGHTING_VERTEX_SHADER_DIR, LIGHTING_FRAGMENT_SHADER_DIR);
 
     // Lighting Shaders
     // ----------------
     // char[] for lighting vertex shader directory.
-    char LIGHT_CUBE_VERTEX_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lightCube.vs")];
-    strcpy(LIGHT_CUBE_VERTEX_SHADER_DIR, (current_working_dir + "shaders\\lightCube.vs").c_str());
+    char LIGHT_CUBE_VERTEX_SHADER_DIR[globalDir.size() + strlen("shaders\\lightCube.vs")];
+    strcpy(LIGHT_CUBE_VERTEX_SHADER_DIR, (globalDir + "shaders\\lightCube.vs").c_str());
 
     // char[] for lighting fragment shader directory.
-    char LIGHT_CUBE_FRAGMENT_SHADER_DIR[current_working_dir.size() + strlen("shaders\\lightCube.fs")];
-    strcpy(LIGHT_CUBE_FRAGMENT_SHADER_DIR, (current_working_dir + "shaders\\lightCube.fs").c_str());
+    char LIGHT_CUBE_FRAGMENT_SHADER_DIR[globalDir.size() + strlen("shaders\\lightCube.fs")];
+    strcpy(LIGHT_CUBE_FRAGMENT_SHADER_DIR, (globalDir + "shaders\\lightCube.fs").c_str());
 
     Shader lightCubeShader(LIGHT_CUBE_VERTEX_SHADER_DIR, LIGHT_CUBE_FRAGMENT_SHADER_DIR);
 #pragma endregion
 
 #pragma region User Defined Shapes
 	float vertices[] = {
-		// Positions        	 // Normals
-        -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-		-0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-  
-		-0.5f, -0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, 	 0.0f,  0.0f,  1.0f,
- 
-		-0.5f,  0.5f,  0.5f, 	-1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, 	-1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, 	-1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, 	-1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, 	-1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, 	-1.0f,  0.0f,  0.0f,
- 
-		 0.5f,  0.5f,  0.5f, 	 1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f, 	 1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f, 	 1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f, 	 1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	 1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	 1.0f,  0.0f,  0.0f,
-  
-		-0.5f, -0.5f, -0.5f, 	 0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f, 	 0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	 0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f, 	 0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, 	 0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, 	 0.0f, -1.0f,  0.0f,
-  
-		-0.5f,  0.5f, -0.5f, 	 0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f, 	 0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	 0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f, 	 0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, 	 0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, 	 0.0f,  1.0f,  0.0f
+		// Positions            // Normals              // Texture Coordinates
+		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f,  0.0f,
+		
+		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f,  1.0f,		0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,	0.0f,  0.0f,  1.0f,		1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,	0.0f,  0.0f,  1.0f,		1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,	0.0f,  0.0f,  1.0f,		1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,	0.0f,  0.0f,  1.0f,		0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f,  1.0f,		0.0f,  0.0f,
+		
+		-0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,		1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,	1.0f,  0.0f,  0.0f,		1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,		0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,		0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,	1.0f,  0.0f,  0.0f,		0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,		1.0f,  0.0f,
+		
+		 0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,		1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,	1.0f,  0.0f,  0.0f,		1.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,		0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,	1.0f,  0.0f,  0.0f,		0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,	1.0f,  0.0f,  0.0f,		0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,	1.0f,  0.0f,  0.0f,		1.0f,  0.0f,
+		
+		-0.5f, -0.5f, -0.5f,	0.0f, -1.0f,  0.0f,		0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,	0.0f, -1.0f,  0.0f,		1.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,	0.0f, -1.0f,  0.0f,		1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,	0.0f, -1.0f,  0.0f,		1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,	0.0f, -1.0f,  0.0f,		0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, -1.0f,  0.0f,		0.0f,  1.0f,
+		
+		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		0.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,		1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,		1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,		0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,		0.0f,  1.0f
 	};
 #pragma endregion
 
@@ -245,12 +278,16 @@ int main() {
     glBindVertexArray(VAO); // Bind VAO
 
     // Set vertex position attribute pointers.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)nullptr);
     glEnableVertexAttribArray(0);
 
     // Set normal attribute pointers.
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+	
+	// Set texture attribute pointers.
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
     // Generate Light VAO
     // ------------------
@@ -262,10 +299,12 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     // Set vertex attributes.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)nullptr);
     glEnableVertexAttribArray(0);
 #pragma endregion
 	
+	// FPS Debug Variables
+	// -------------------
 	double currentFrame; // Time of current frame in seconds.
 	unsigned int timePrev = 0; // Time of last frame rounded to two decimals.
 	
@@ -275,6 +314,14 @@ int main() {
 	
 	double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Stores FPSs over last 10 seconds to calculate SMA10.
 
+	// Render Variables
+	// ----------------
+	unsigned int diffuseMap = loadTextures("container2.png");
+	unsigned int specularMap = loadTextures("container2_specular.png");
+	lightingShader.use();
+	lightingShader.setInt("material.diffuse", 0);
+	lightingShader.setInt("material.specular", 1);
+	
 	// Render loop
 	// -----------
 	while (!glfwWindowShouldClose(window)) {
@@ -319,26 +366,14 @@ int main() {
 
         // Shading
         // -------
-        lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+		lightingShader.use();
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
 		
-		// RGB Light Party!
-		glm::vec3 lightColor;
-		lightColor.x = static_cast<float>(sin(glfwGetTime() * 2.0));
-		lightColor.y = static_cast<float>(sin(glfwGetTime() * 0.7));
-		lightColor.z = static_cast<float>(sin(glfwGetTime() * 1.3));
-		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
-
-        lightingShader.setVec3("light.ambient", ambientColor);
-        lightingShader.setVec3("light.diffuse", diffuseColor);
+		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-        lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+		
         lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         lightingShader.setFloat("material.shininess", 32.0f);
 
@@ -354,11 +389,16 @@ int main() {
 
         // The model matrix holds translations, scaling, and/or rotations that transform all object's vertices to the global world space.
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(5.0f, -0.025f, 5.0f));
         lightingShader.setMat4("model", model);
-
-        // Draw cube object.
+		
+		// Bind textures.
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+		
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
+		
+		// Draw cube object.
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
