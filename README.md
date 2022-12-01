@@ -1,6 +1,8 @@
 # Notreal™ Engine
 A graphics engine that has totally ~~un~~notreal capabilities. This is a wip hobby graphics engine written with C++, OpenGL, and GLFW.
 
+<img src="https://github.com/SoupyzInc/NotrealEngine/blob/main/docs/58abe127/phong_demo.png" alt="A wooden crate with a shiny metal frame.">
+
 ### Cutting-Bleeding-Edge-Vanguard-Super-Ultra™ Tech Demo
 <details>
 <summary><b>Vertex and Fragment Shader</b></summary>
