@@ -1,6 +1,7 @@
 #version 330 core
 struct Light {
-    vec3 position;
+//     vec3 position;
+    vec3 direction;
 
     vec3 ambient;
     vec3 diffuse;
@@ -30,7 +31,8 @@ void main() {
 
     // Diffuse lighting
     vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(light.position - FragPos);
+//     vec3 lightDir = normalize(light.position - FragPos);
+    vec3 lightDir = normalize(-light.direction);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.diffuse * diff * texture(material.diffuse, TexCoords).rgb;
 
@@ -41,8 +43,8 @@ void main() {
     vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;
 
     // Emission lighting
-    vec3 emission = texture(material.emission, TexCoords).rgb;
+//     vec3 emission = texture(material.emission, TexCoords).rgb;
 
-    FragColor = vec4(ambient + diffuse + specular + emission, 1.0);
+    FragColor = vec4(ambient + diffuse + specular, 1.0);
 //    FragColor = vec4(1.0); // Debug View (all objects white).
 }
