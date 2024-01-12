@@ -13,7 +13,8 @@ include_directories(lib/GLM) # GLM header files
 include_directories(lib/imgui)
 include_directories(lib/imgui/backends)
 
-#make an imgui folder and put all of these files in the imgui folder
+# IMGUI
+# =====
 set(IMGUI_SRC
         lib/imgui/misc/cpp/imgui_stdlib.cpp
         lib/imgui/misc/cpp/imgui_stdlib.h
@@ -29,16 +30,12 @@ set(IMGUI_SRC
         lib/imgui/imstb_rectpack.h
         lib/imgui/imstb_textedit.h
         lib/imgui/imstb_truetype.h
+
         lib/imgui/backends/imgui_impl_glfw.h
         lib/imgui/backends/imgui_impl_glfw.cpp
         lib/imgui/backends/imgui_impl_opengl3.h
         lib/imgui/backends/imgui_impl_opengl3.cpp
 )
-
-#Create the executable and link against all the files provided to us by ImGui
-#add_executable(NotrealEngine ${IMGUI_SRC})
-
-#target_link_libraries(NotrealEngine PRIVATE glfw glad::glad) #link the two libraries into the application
 
 # Build Executable
 # ================
@@ -50,13 +47,9 @@ add_executable(NotrealEngine
     lib/STB/stb_image.cpp
     lib/camera/camera.h
     ${IMGUI_SRC}
-#    lib/imgui/imgui.h
-#    lib/imgui/backends/imgui_impl_glfw.h
-#    lib/imgui/backends/imgui_impl_opengl3.h
 )
 
 # Link Libraries
 # ==============
 target_link_libraries(NotrealEngine -lOpenGL32 -lglu32) # OpenGL
 target_link_libraries(NotrealEngine glfw) # GLFW
-#target_link_libraries(NotrealEngine imgui)
