@@ -73,6 +73,30 @@ void processInput(GLFWwindow *window) {
     } else {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+
+    // Left click
+    bool click = false;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        click = true;
+    }
+
+    if (click) { camera.left_click = true; } else { camera.left_click = false; }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+        click = false;
+    }
+
+    // Right click
+    click = false;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        click = true;
+    }
+
+    if (click) { camera.right_click = true; } else { camera.right_click = false; }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
+        click = false;
+    }
 }
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
@@ -92,6 +116,26 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     lastY = ypos;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+//    bool click = false;
+//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+//        std::cout << "LEFT PRESS" << std::endl;
+//        click = true;
+//    }
+//
+//    if (click) {
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    } else {
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    }
+//
+//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+//        std::cout << "LEFT RELEASE" << std::endl;
+//        click = false;
+//    }
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
@@ -194,6 +238,7 @@ int main() {
     glfwSwapInterval(0); // Disable vsync.
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Hide cursor and capture position.
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
     // GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling any OpenGL functions.
@@ -554,8 +599,6 @@ int main() {
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-//        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-//        glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window); // Swaps color buffer.
@@ -564,7 +607,6 @@ int main() {
 
     // Relieve buffers.
     glDeleteVertexArrays(1, &VAO);
-//    glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
 
     // Cleanup
