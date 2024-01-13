@@ -1,7 +1,5 @@
-#include <climits>
-#include <cstring>
 #include <direct.h>
-#include <iomanip>
+#include <climits>
 #include <iostream>
 
 #include <glad/glad.h>
@@ -77,25 +75,36 @@ void processInput(GLFWwindow *window) {
     // Left click
     bool click = false;
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        click = true;
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS);
+
+        if (!io.WantCaptureMouse) { click = true; }
     }
 
     if (click) { camera.left_click = true; } else { camera.left_click = false; }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
         click = false;
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE);
     }
 
     // Right click
     click = false;
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        click = true;
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
+
+        if (!io.WantCaptureMouse) { click = true; }
+
     }
 
     if (click) { camera.right_click = true; } else { camera.right_click = false; }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
         click = false;
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_RIGHT, GLFW_RELEASE);
     }
 }
 
@@ -118,28 +127,8 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-//    bool click = false;
-//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-//        std::cout << "LEFT PRESS" << std::endl;
-//        click = true;
-//    }
-//
-//    if (click) {
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//    } else {
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//    }
-//
-//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-//        std::cout << "LEFT RELEASE" << std::endl;
-//        click = false;
-//    }
-}
-
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
 }
 
 static void glfw_error_callback(int error, const char *description) {
@@ -238,7 +227,6 @@ int main() {
     glfwSwapInterval(0); // Disable vsync.
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Hide cursor and capture position.
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
     // GLAD manages function pointers for OpenGL. Therefore, we want to initialize it before calling any OpenGL functions.

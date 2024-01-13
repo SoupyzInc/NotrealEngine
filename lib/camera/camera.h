@@ -109,11 +109,9 @@ public:
     }
 
     // Only requires input on the vertical wheel-axis.
-    void ProcessMouseScroll(float yoffset) {
-        Zoom -= (float) yoffset;
-        if (Zoom < 1.0f) { Zoom = 1.0f; }
-
-        if (Zoom > 45.0f) { Zoom = 45.0f; }
+    void ProcessMouseScroll(float yoffset, float deltaTime) {
+        float velocity = MovementSpeed * deltaTime * 50;
+        Position += Front * velocity * yoffset; // yoffset is either -1 or 1.
     }
 
 private:
