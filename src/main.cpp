@@ -1,7 +1,5 @@
-#include <climits>
-#include <cstring>
 #include <direct.h>
-#include <iomanip>
+#include <climits>
 #include <iostream>
 
 #include <glad/glad.h>
@@ -73,6 +71,41 @@ void processInput(GLFWwindow *window) {
     } else {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+
+    // Left click
+    bool click = false;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS);
+
+        if (!io.WantCaptureMouse) { click = true; }
+    }
+
+    if (click) { camera.left_click = true; } else { camera.left_click = false; }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+        click = false;
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE);
+    }
+
+    // Right click
+    click = false;
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
+
+        if (!io.WantCaptureMouse) { click = true; }
+
+    }
+
+    if (click) { camera.right_click = true; } else { camera.right_click = false; }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
+        click = false;
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_RIGHT, GLFW_RELEASE);
+    }
 }
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
@@ -95,7 +128,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
 }
 
 static void glfw_error_callback(int error, const char *description) {
@@ -554,8 +587,6 @@ int main() {
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-//        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-//        glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window); // Swaps color buffer.
@@ -564,7 +595,6 @@ int main() {
 
     // Relieve buffers.
     glDeleteVertexArrays(1, &VAO);
-//    glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
 
     // Cleanup
