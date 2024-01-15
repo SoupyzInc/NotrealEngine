@@ -127,8 +127,12 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
+// Keeps track of scroll displacement.
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureMouse) {
+        camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
+    }
 }
 
 static void glfw_error_callback(int error, const char *description) {
