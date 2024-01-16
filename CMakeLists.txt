@@ -35,6 +35,8 @@ set(IMGUI_SRC
         lib/imgui/backends/imgui_impl_glfw.cpp
         lib/imgui/backends/imgui_impl_opengl3.h
         lib/imgui/backends/imgui_impl_opengl3.cpp
+        src/actor.cpp
+        src/actor.h
 )
 
 # Build Executable

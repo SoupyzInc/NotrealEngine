@@ -15,6 +15,8 @@
 #include "../shaders/shader.h"
 #include "stb_image.h"
 
+#include "actor.h"
+
 #include "../lib/camera/camera.h"
 
 using namespace std;
@@ -180,6 +182,20 @@ unsigned int loadTextures(const char *fileName) {
 
     stbi_image_free(data); // Free memory.
     return textureId;
+}
+
+void updateActors(actor actors[], int n) {
+    for (int i = 0; i < n; ++i) {
+        if (i == 0)
+            actors[i].Position.x += 0.001;
+
+        if (i == 1)
+            actors[i].Position.y += 0.001;
+
+        if (i == 2)
+            actors[i].Position.z += 0.001;
+
+    }
 }
 
 int main() {
@@ -452,6 +468,13 @@ int main() {
     lightingShader.setInt("material.specular", 1);
     lightingShader.setInt("material.emission", 2);
 
+    // Actors
+    // ------
+    actor a1(glm::vec3(0.0f,0.0f,0.0f));
+    actor a2(glm::vec3(0.0f,0.0f,0.0f));
+    actor a3(glm::vec3(0.0f,0.0f,0.0f));
+    actor actors[3] = {a1, a2, a3};
+
     // Render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
@@ -533,16 +556,25 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
 
-        for (unsigned int i = 0; i < 10; i++) {
+        for (auto& a: actors) {
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::translate(model, a.Position);
             lightingShader.setMat4("model", model);
 
             glBindVertexArray(VAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+//        for (unsigned int i = 0; i < 10; i++) {
+//            glm::mat4 model = glm::mat4(1.0f);
+//            model = glm::translate(model, cubePositions[i]);
+//            float angle = 20.0f * i;
+//            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+//            lightingShader.setMat4("model", model);
+//
+//            glBindVertexArray(VAO);
+//            glDrawArrays(GL_TRIANGLES, 0, 36);
+//        }
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -595,6 +627,11 @@ int main() {
 
         glfwSwapBuffers(window); // Swaps color buffer.
         glfwPollEvents(); // Checks if any events are triggered.
+
+        if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+            // Update actors
+            updateActors(actors, 3);
+        }
     }
 
     // Relieve buffers.
