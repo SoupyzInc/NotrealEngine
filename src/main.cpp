@@ -470,9 +470,7 @@ int main() {
 
     // Actors
     // ------
-    actor a1(glm::vec3(0.0f,0.0f,0.0f));
-    actor a2(glm::vec3(0.0f,0.0f,0.0f));
-    actor a3(glm::vec3(0.0f,0.0f,0.0f));
+    actor a1, a2, a3;
     actor actors[3] = {a1, a2, a3};
 
     // Render loop
@@ -500,11 +498,7 @@ int main() {
                 counter = 0;
             }
 
-            averageFps = static_cast<unsigned int>(
-                    (FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9])
-                    / 10);
-
-            string newTitle = "Notreal Engine | " + to_string(frames) + " FPS/" + to_string(averageFps) + " AFPS | "
+            string newTitle = "Notreal Engine | " + to_string(frames) + " FPS | "
                               + to_string(deltaTime * 1000) + " MSPF | " + to_string(timeNow / 100) + "S";
             glfwSetWindowTitle(window, newTitle.c_str());
 

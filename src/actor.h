@@ -11,7 +11,7 @@
 class actor {
 public:
     glm::vec3 Position;
-    actor(glm::vec3 pos);
+    explicit actor(glm::vec3 pos = glm::vec3(0.0f,0.0f,0.0f));
 };
 
 
