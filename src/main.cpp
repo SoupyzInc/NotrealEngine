@@ -77,7 +77,7 @@ void processInput(GLFWwindow *window) {
     // Left click
     bool click = false;
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO &io = ImGui::GetIO();
         io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS);
 
         if (!io.WantCaptureMouse) { click = true; }
@@ -87,14 +87,14 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
         click = false;
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO &io = ImGui::GetIO();
         io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE);
     }
 
     // Right click
     click = false;
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO &io = ImGui::GetIO();
         io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
 
         if (!io.WantCaptureMouse) { click = true; }
@@ -105,7 +105,7 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
         click = false;
-        ImGuiIO& io = ImGui::GetIO();
+        ImGuiIO &io = ImGui::GetIO();
         io.AddMouseButtonEvent(GLFW_MOUSE_BUTTON_RIGHT, GLFW_RELEASE);
     }
 }
@@ -131,7 +131,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn) {
 
 // Keeps track of scroll displacement.
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     if (!io.WantCaptureMouse) {
         camera.ProcessMouseScroll(static_cast<float>(yoffset), deltaTime);
     }
@@ -216,7 +216,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
 #else
     // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+    const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
@@ -268,7 +268,8 @@ int main() {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void) io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -301,7 +302,7 @@ int main() {
     //IM_ASSERT(font != nullptr);
     io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 24.0f);
 
-    ImGuiStyle * style = &ImGui::GetStyle();
+    ImGuiStyle *style = &ImGui::GetStyle();
     style->ScaleAllSizes(2.0f);
 
 
@@ -459,7 +460,7 @@ int main() {
     unsigned int frames = 0; // How many frames have passed in one second.
     unsigned int counter = 1; // Index of FPSs.
 
-    double FPSs[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Stores FPSs over last 10 seconds to calculate SMA10.
+    double FPSs[10] = {0}; // Stores FPSs over last 10 seconds to calculate SMA10.
 
     // Render Variables
     // ----------------
@@ -476,41 +477,23 @@ int main() {
     // Actors
     // ------
     actor a1, a2, a3;
-    actor actors[3] = {a1, a2, a3};
+    int n = 3;
+    actor actors[] = {a1, a2, a3};
+    glm::vec3 actor_buffer[n];
 
     // Render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
-        // FPS Debug Information
-        // ---------------------
-        frames++;
+        for (int i = 0; i < n; ++i) {
+            actor_buffer[i] = actors[i].Position;
+        }
+
         currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        auto timeNow = static_cast<unsigned int>(currentFrame * 100); // Use 2 decimal places of accuracy.
-
-        // Skipped second due to low TPS or window interruption.
-        if (timeNow / 100 - timePrev / 100 > 1) {
-            timePrev = timeNow; // Reset second check cycle.
-        }
-
-        // If approximately one second has passed.
-        if (timeNow - timePrev == 100) {
-            FPSs[counter - 1] = frames;
-
-            if (counter % 10 == 0) {
-                counter = 0;
-            }
-
-            string newTitle = "Notreal Engine | " + to_string(frames) + " FPS | "
-                              + to_string(deltaTime * 1000) + " MSPF | " + to_string(timeNow / 100) + "S";
-            glfwSetWindowTitle(window, newTitle.c_str());
-
-            frames = 0;
-            timePrev = timeNow;
-            counter++;
-        }
+        string newTitle = "Notreal Engine | " + to_string(io.Framerate) + " FPS";
+        glfwSetWindowTitle(window, newTitle.c_str());
 
         processInput(window); // Check for key inputs.
 
@@ -555,7 +538,7 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
 
-        for (auto& a: actors) {
+        for (auto &a: actors) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, a.Position);
             lightingShader.setMat4("model", model);
@@ -573,16 +556,18 @@ int main() {
         static float f = 0.0f;
         static int counter = 0;
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin(
+                "Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
         ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
         ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
         ImGui::Checkbox("Another Window", &show_another_window);
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
 
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        if (ImGui::Button(
+                "Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
