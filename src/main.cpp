@@ -1,6 +1,7 @@
 #include <direct.h>
 #include <climits>
 #include <iostream>
+#include <queue>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -454,13 +455,6 @@ int main() {
     // FPS Debug Variables
     // -------------------
     double currentFrame; // Time of current frame in seconds.
-    unsigned int timePrev = 0; // Time of last frame rounded to two decimals.
-
-    unsigned int averageFps; // The average FPS over last 10 seconds.
-    unsigned int frames = 0; // How many frames have passed in one second.
-    unsigned int counter = 1; // Index of FPSs.
-
-    double FPSs[10] = {0}; // Stores FPSs over last 10 seconds to calculate SMA10.
 
     // Render Variables
     // ----------------
@@ -478,14 +472,28 @@ int main() {
     // ------
     actor a1, a2, a3;
     int n = 3;
+    int buffer_counter = 1;
     actor actors[] = {a1, a2, a3};
-    glm::vec3 actor_buffer[n];
+    std::deque<glm::vec3> actor_buffer[n];
+
+    for (int i = 0; i < n; ++i) {
+        actor_buffer[i].push_back(actors[i].Position);
+    }
 
     // Render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
+        if (buffer_counter == 1000) {
+            buffer_counter = 1000;
+            for (auto &a : actor_buffer) {
+                a.pop_front();
+            }
+        } else {
+            buffer_counter++;
+        }
+
         for (int i = 0; i < n; ++i) {
-            actor_buffer[i] = actors[i].Position;
+            actor_buffer[i].push_back(actors[i].Position);
         }
 
         currentFrame = glfwGetTime();
@@ -538,14 +546,34 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
 
-        for (auto &a: actors) {
+        for (int i = 0; i < n; ++i) {
+            // Draw real actor.
             glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, a.Position);
+            model = glm::translate(model, actors[i].Position);
             lightingShader.setMat4("model", model);
 
             glBindVertexArray(VAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            // Draw trail
+//            for (auto &ab : actor_buffer[i]) {
+//                model = glm::mat4(1.0f);
+//                model = glm::translate(model, ab);
+//                lightingShader.setMat4("model", model);
+//
+//                glBindVertexArray(VAO);
+//                glDrawArrays(GL_TRIANGLES, 0, 36);
+//            }
         }
+
+//        for (auto &a: actors) {
+//            glm::mat4 model = glm::mat4(1.0f);
+//            model = glm::translate(model, a.Position);
+//            lightingShader.setMat4("model", model);
+//
+//            glBindVertexArray(VAO);
+//            glDrawArrays(GL_TRIANGLES, 0, 36);
+//        }
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
