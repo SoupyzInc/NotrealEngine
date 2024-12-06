@@ -13,6 +13,9 @@
 #include "../shaders/shader.h"
 #include "stb_image.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 #include "../lib/camera/camera.h"
 
 using namespace std;
@@ -132,6 +135,29 @@ unsigned int loadTextures(const char *fileName) {
 	stbi_image_free(data); // Free memory.
 	return textureId;
 }
+
+void saveScreenshot(const char* filename, int width, int height) {
+	// Allocate memory to store pixel data
+	std::vector<unsigned char> pixels(width * height * 3);
+
+	// Read pixel data from the framebuffer
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+	// Flip the image vertically (OpenGL's origin is bottom-left, image libraries often expect top-left)
+	for (int y = 0; y < height / 2; ++y) {
+		for (int x = 0; x < width * 3; ++x) {
+			std::swap(pixels[y * width * 3 + x], pixels[(height - 1 - y) * width * 3 + x]);
+		}
+	}
+
+	// Save the image to a file
+	if (stbi_write_png(filename, width, height, 3, pixels.data(), width * 3)) {
+		std::cout << "Screenshot saved to " << filename << "\n";
+	} else {
+		std::cerr << "Failed to save screenshot.\n";
+	}
+}
+
 
 int main() {
 #pragma region Program Setup
@@ -314,15 +340,17 @@ int main() {
 
 	// Render Variables
 	// ----------------
-	unsigned int diffuseMap = loadTextures("container2.png");
+	unsigned int diffuseMap = loadTextures("road.png");
 	unsigned int specularMap = loadTextures("container2_specular.png");
-	unsigned int emissionMap = loadTextures("container2_emission.png");
+	// unsigned int emissionMap = loadTextures("container2_emission.png");
 	
 	lightingShader.use();
 	lightingShader.setInt("material.diffuse", 0);
 	lightingShader.setInt("material.specular", 1);
-	lightingShader.setInt("material.emission", 2);
-	
+	// lightingShader.setInt("material.emission", 2);
+
+	bool ss_saved = false;
+
 	// Render loop
 	// -----------
 	while (!glfwWindowShouldClose(window)) {
@@ -344,10 +372,6 @@ int main() {
 		if (timeNow - timePrev == 100) {
 			FPSs[counter - 1] = frames;
 			
-			if (counter % 10 == 0) {
-				counter = 0;
-			}
-			
 			averageFps = static_cast<unsigned int>(
 				(FPSs[0] + FPSs[1] + FPSs[2] + FPSs[3] + FPSs[4] + FPSs[5] + FPSs[6] + FPSs[7] + FPSs[8] + FPSs[9])
 					/ 10);
@@ -359,6 +383,10 @@ int main() {
 			frames = 0;
 			timePrev = timeNow;
 			counter++;
+
+			if (counter >= 10) {
+				counter = 0;
+			}
 		}
 
 		processInput(window); // Check for key inputs.
@@ -377,7 +405,7 @@ int main() {
 		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 		
-        lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("material.specular", 0.0f, 0.0f, 0.0f);
         lightingShader.setFloat("material.shininess", 32.0f);
 
 		// Rendering
@@ -404,8 +432,8 @@ int main() {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 		
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, emissionMap);
+		// glActiveTexture(GL_TEXTURE2);
+		// glBindTexture(GL_TEXTURE_2D, emissionMap);
 		
 		// Draw cube object.
         glBindVertexArray(VAO);
@@ -422,8 +450,13 @@ int main() {
         lightCubeShader.setMat4("view", view);
         lightCubeShader.setMat4("model", model);
 
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glBindVertexArray(lightVAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		if (!ss_saved) {
+			saveScreenshot(R"(C:\Users\armyd\CLionProjects\NotrealEngine\src\screenshot.png)", WIDTH, HEIGHT);
+			ss_saved = true;
+		}
 
 		glfwSwapBuffers(window); // Swaps color buffer.
 		glfwPollEvents(); // Checks if any events are triggered.

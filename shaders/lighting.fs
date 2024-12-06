@@ -43,6 +43,7 @@ void main() {
     // Emission lighting
     vec3 emission = texture(material.emission, TexCoords).rgb;
 
-    FragColor = vec4(ambient + diffuse + specular + emission, 1.0);
+//     FragColor = vec4(ambient + diffuse + specular + emission, 1.0);
+    FragColor = vec4(ambient + diffuse, 1.0);
 //    FragColor = vec4(1.0); // Debug View (all objects white).
 }

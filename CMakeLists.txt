@@ -24,6 +24,7 @@ if (NOT testMode)
         lib/STB/stb_image.h
         lib/STB/stb_image.cpp
         lib/camera/camera.h
+        lib/STB/stb_image_write.h
     )
 else()
     message(STATUS "Value testMode is set to ON. Using src/test.cpp as entry.")
@@ -33,7 +34,10 @@ else()
         shaders/shader.h
         lib/STB/stb_image.h
         lib/STB/stb_image.cpp
-        lib/camera/camera.h)
+        lib/camera/camera.h
+        lib/STB/stb_image_write.h
+    )
+
 endif()
 
 # Link Libraries
